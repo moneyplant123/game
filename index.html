@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyInteractive.fun</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: left;
+            padding: 40px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #777;
+            font-size: 18px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .project-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 200px;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .project-card-content {
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .project-card h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .project-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .interactive-container {
+            display: none;
+            padding: 40px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            margin: 20px 0;
+            min-height: 400px;
+            text-align: center;
+        }
+
+        .close-btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: #fff;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        .btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn.active {
+            background-color: #333;
+            color: #fff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #canvas-container {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MyInteractive.fun</h1>
+        <p>A collection of interactive experiments</p>
+    </header>
+
+    <div class="projects-grid">
+        <div class="project-card" data-project="perfect-shape">
+            <div class="project-card-content">
+                <h3>Draw a Perfect Shape</h3>
+                <p>Test your mouse precision skills</p>
+            </div>
+        </div>
+        
+        <div class="project-card" data-project="time-explorer">
+            <div class="project-card-content">
+                <h3>Time Explorer</h3>
+                <p>Journey through important events</p>
+            </div>
+        </div>
+        
+        <div class="project-card" data-project="digital-sandbox">
+            <div class="project-card-content">
+                <h3>Digital Sandbox</h3>
+                <p>Create and experiment</p>
+            </div>
+        </div>
+        
+        <div class="project-card" data-project="data-viz">
+            <div class="project-card-content">
+                <h3>Data Visualizer</h3>
+                <p>Explore data in a new way</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Perfect Shape Game -->
+    <div id="perfect-shape-container" class="interactive-container">
+        <button class="close-btn">Close</button>
+        <h2>Draw a Perfect Shape</h2>
+        <div class="controls">
+            <button class="btn active" data-shape="circle">Circle</button>
+            <button class="btn" data-shape="square">Square</button>
+            <button class="btn" data-shape="triangle">Triangle</button>
+        </div>
+        <div id="canvas-container">
+            <canvas id="shape-canvas" width="400" height="400"></canvas>
+        </div>
+        <div id="score-display">Score: 0%</div>
+        <button id="reset-btn" class="close-btn">Try Again</button>
+    </div>
+
+    <!-- Time Explorer -->
+    <div id="time-explorer-container" class="interactive-container">
+        <button class="close-btn">Close</button>
+        <h2>Time Explorer</h2>
+        <p>Slide through time to discover major events</p>
+        <input type="range" min="1900" max="2025" value="1960" class="timeline-slider" id="year-slider">
+        <h3 id="current-year">1960</h3>
+        <div id="event-display">
+            <h3>Select a year on the timeline</h3>
+        </div>
+    </div>
+
+    <!-- Digital Sandbox -->
+    <div id="digital-sandbox-container" class="interactive-container">
+        <button class="close-btn">Close</button>
+        <h2>Digital Sandbox</h2>
+        <p>Click and drag to create digital particles</p>
+        <div class="controls">
+            <button class="btn active" data-tool="particles">Particles</button>
+            <button class="btn" data-tool="lines">Lines</button>
+            <button class="btn" data-tool="gravity">Gravity</button>
+            <button class="btn" id="clear-btn">Clear</button>
+        </div>
+        <canvas id="sandbox-canvas" width="600" height="400"></canvas>
+    </div>
+
+    <!-- Data Visualizer -->
+    <div id="data-viz-container" class="interactive-container">
+        <button class="close-btn">Close</button>
+        <h2>Data Visualizer</h2>
+        <p>Explore different data sets visually</p>
+        <div class="controls">
+            <button class="btn active" data-dataset="population">Population</button>
+            <button class="btn" data-dataset="temperature">Temperature</button>
+            <button class="btn" data-dataset="internet">Internet Usage</button>
+        </div>
+        <div id="chart-container" style="height: 300px; margin: 30px auto; position: relative;"></div>
+    </div>
+
+    <footer>
+        <p>Created with ❤️ | MyInteractive.fun 2025</p>
+        <p>Inspired by creative web experiences</p>
+    </footer>
+
+    <script>
+        // Project Navigation
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const projectId = card.getAttribute('data-project');
+                const container = document.getElementById(`${projectId}-container`);
+                
+                // Hide all containers
+                document.querySelectorAll('.interactive-container').forEach(cont => {
+                    cont.style.display = 'none';
+                });
+                
+                // Show selected container
+                container.style.display = 'block';
+                
+                // Initialize specific project
+                if (projectId === 'perfect-shape') {
+                    initPerfectShape();
+                } else if (projectId === 'time-explorer') {
+                    initTimeExplorer();
+                } else if (projectId === 'digital-sandbox') {
+                    initDigitalSandbox();
+                } else if (projectId === 'data-viz') {
+                    initDataViz();
+                }
+            });
+        });
+        
+        // Close buttons
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const container = btn.closest('.interactive-container');
+                container.style.display = 'none';
+            });
+        });
+        
+        // Perfect Shape Game
+        let shapeCtx, currentShape = 'circle', isDrawing = false;
+        let startX, startY, points = [];
+        
+        function initPerfectShape() {
+            const canvas = document.getElementById('shape-canvas');
+            shapeCtx = canvas.getContext('2d');
+            
+            // Clear canvas
+            shapeCtx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Reset variables
+            isDrawing = false;
+            points = [];
+            document.getElementById('score-display').textContent = 'Score: 0%';
+            
+            // Shape selection
+            document.querySelectorAll('#perfect-shape-container .btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#perfect-shape-container .btn').forEach(b => 
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentShape = btn.getAttribute('data-shape');
+                    resetCanvas();
+                });
+            });
+            
+            // Canvas events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', endDrawing);
+            canvas.addEventListener('mouseleave', endDrawing);
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', resetCanvas);
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            points = [];
+            
+            const rect = e.target.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            
+            points.push({ x: startX, y: startY });
+            
+            shapeCtx.beginPath();
+            shapeCtx.moveTo(startX, startY);
+            shapeCtx.strokeStyle = '#333';
+            shapeCtx.lineWidth = 2;
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            points.push({ x, y });
+            
+            shapeCtx.lineTo(x, y);
+            shapeCtx.stroke();
+        }
+        
+        function endDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            
+            // Calculate and display score (random in this simplified version)
+            const score = Math.floor(Math.random() * 60) + 40; // Random score between 40-99%
+            document.getElementById('score-display').textContent = `Score: ${score}%`;
+        }
+        
+        function resetCanvas() {
+            const canvas = document.getElementById('shape-canvas');
+            shapeCtx.clearRect(0, 0, canvas.width, canvas.height);
+            points = [];
+            document.getElementById('score-display').textContent = 'Score: 0%';
+        }
+        
+        // Time Explorer
+        const timelineEvents = [
+            { year: 1903, event: "First Powered Flight", description: "The Wright brothers make the first controlled, sustained flight." },
+            { year: 1912, event: "Titanic Sinks", description: "The 'unsinkable' ship sinks on its maiden voyage." },
+            { year: 1928, event: "Penicillin Discovered", description: "Alexander Fleming discovers the first antibiotic." },
+            { year: 1945, event: "End of World War II", description: "World War II ends after six years of conflict." },
+            { year: 1969, event: "Moon Landing", description: "First humans walk on the moon." },
+            { year: 1989, event: "Berlin Wall Falls", description: "The Berlin Wall falls, symbolizing the end of the Cold War." },
+            { year: 2007, event: "iPhone Released", description: "The first iPhone revolutionizes mobile technology." },
+            { year: 2020, event: "Global Pandemic", description: "A global health crisis changes how people live and work." }
+        ];
+        
+        function initTimeExplorer() {
+            const slider = document.getElementById('year-slider');
+            const yearDisplay = document.getElementById('current-year');
+            const eventDisplay = document.getElementById('event-display');
+            
+            slider.addEventListener('input', () => {
+                const year = slider.value;
+                yearDisplay.textContent = year;
+                
+                // Find if there's an event for this year
+                const event = timelineEvents.find(e => e.year == year);
+                
+                if (event) {
+                    eventDisplay.innerHTML = `
+                        <h3>${event.year}: ${event.event}</h3>
+                        <p>${event.description}</p>
+                    `;
+                } else {
+                    eventDisplay.innerHTML = `<h3>${year}</h3><p>No major event in our database for this year.</p>`;
+                }
+            });
+        }
+        
+        // Digital Sandbox
+        let sandboxCtx, sandboxAnimFrame;
+        let particles = [];
+        let currentTool = 'particles';
+        
+        function initDigitalSandbox() {
+            const canvas = document.getElementById('sandbox-canvas');
+            sandboxCtx = canvas.getContext('2d');
+            
+            // Clear canvas
+            sandboxCtx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Reset particles
+            particles = [];
+            
+            // Tool selection
+            document.querySelectorAll('#digital-sandbox-container .btn').forEach(btn => {
+                if (btn.id !== 'clear-btn') {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('#digital-sandbox-container .btn').forEach(b => 
+                            b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentTool = btn.getAttribute('data-tool');
+                    });
+                }
+            });
+            
+            // Canvas events
+            canvas.addEventListener('mousedown', createParticles);
+            canvas.addEventListener('mousemove', (e) => {
+                if (e.buttons === 1) {
+                    createParticles(e);
+                }
+            });
+            
+            // Clear button
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                particles = [];
+                sandboxCtx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+            
+            // Start animation
+            if (sandboxAnimFrame) {
+                cancelAnimationFrame(sandboxAnimFrame);
+            }
+            animateSandbox();
+        }
+        
+        function createParticles(e) {
+            const canvas = document.getElementById('sandbox-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const colors = ['#4C86F9', '#F94C6F', '#4CF97A', '#F9E44C'];
+            
+            // Create particles based on selected tool
+            if (currentTool === 'particles') {
+                for (let i = 0; i < 5; i++) {
+                    particles.push({
+                        x,
+                        y,
+                        size: Math.random() * 5 + 2,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        vx: Math.random() * 4 - 2,
+                        vy: Math.random() * 4 - 2,
+                        alpha: 1,
+                        type: 'particle'
+                    });
+                }
+            } else if (currentTool === 'lines') {
+                particles.push({
+                    x,
+                    y,
+                    length: Math.random() * 50 + 20,
+                    angle: Math.random() * Math.PI * 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    type: 'line'
+                });
+            } else if (currentTool === 'gravity') {
+                particles.push({
+                    x,
+                    y,
+                    size: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: Math.random() * 2 - 1,
+                    vy: -10 * Math.random(),
+                    alpha: 1,
+                    type: 'gravity'
+                });
+            }
+        }
+        
+        function animateSandbox() {
+            const canvas = document.getElementById('sandbox-canvas');
+            sandboxCtx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw particles
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                if (p.type === 'particle') {
+                    // Update position
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.01;
+                    
+                    // Draw
+                    sandboxCtx.globalAlpha = p.alpha;
+                    sandboxCtx.fillStyle = p.color;
+                    sandboxCtx.beginPath();
+                    sandboxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    sandboxCtx.fill();
+                    
+                    // Remove if faded
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                } else if (p.type === 'line') {
+                    // Draw line
+                    sandboxCtx.globalAlpha = p.alpha;
+                    sandboxCtx.strokeStyle = p.color;
+                    sandboxCtx.lineWidth = 2;
+                    sandboxCtx.beginPath();
+                    sandboxCtx.moveTo(p.x, p.y);
+                    sandboxCtx.lineTo(
+                        p.x + Math.cos(p.angle) * p.length,
+                        p.y + Math.sin(p.angle) * p.length
+                    );
+                    sandboxCtx.stroke();
+                    
+                    // Fade out
+                    p.alpha -= 0.01;
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                } else if (p.type === 'gravity') {
+                    // Apply gravity
+                    p.vy += 0.2;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    // Bounce off bottom
+                    if (p.y + p.size > canvas.height) {
+                        p.y = canvas.height - p.size;
+                        p.vy *= -0.7;
+                    }
+                    
+                    // Draw
+                    sandboxCtx.globalAlpha = p.alpha;
+                    sandboxCtx.fillStyle = p.color;
+                    sandboxCtx.beginPath();
+                    sandboxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    sandboxCtx.fill();
+                    
+                    // Fade slowly
+                    p.alpha -= 0.002;
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+            
+            sandboxAnimFrame = requestAnimationFrame(animateSandbox);
+        }
+        
+        // Data Visualizer
+        const datasets = {
+            population: [
+                { year: 1950, value: 2.5 },
+                { year: 1960, value: 3.0 },
+                { year: 1970, value: 3.7 },
+                { year: 1980, value: 4.4 },
+                { year: 1990, value: 5.3 },
+                { year: 2000, value: 6.1 },
+                { year: 2010, value: 6.9 },
+                { year: 2020, value: 7.8 }
+            ],
+            temperature: [
+                { year: 1950, value: 0.0 },
+                { year: 1960, value: 0.1 },
+                { year: 1970, value: 0.2 },
+                { year: 1980, value: 0.3 },
+                { year: 1990, value: 0.4 },
+                { year: 2000, value: 0.6 },
+                { year: 2010, value: 0.8 },
+                { year: 2020, value: 1.0 }
+            ],
+            internet: [
+                { year: 1990, value: 0.1 },
+                { year: 1995, value: 1.0 },
+                { year: 2000, value: 6.0 },
+                { year: 2005, value: 15.0 },
+                { year: 2010, value: 30.0 },
+                { year: 2015, value: 43.0 },
+                { year: 2020, value: 59.0 },
+                { year: 2025, value: 65.0 }
+            ]
+        };
+        
+        const dataInfo = {
+            population: {
+                title: "World Population (Billions)",
+                description: "World population growth over time in billions of people."
+            },
+            temperature: {
+                title: "Global Temperature Change (°C)",
+                description: "Change in global average temperature relative to 1950 levels."
+            },
+            internet: {
+                title: "Internet Usage (% of Population)",
+                description: "Percentage of global population with internet access."
+            }
+        };
+        
+        function initDataViz() {
+            // Set up dataset selection
+            document.querySelectorAll('#data-viz-container .btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#data-viz-container .btn').forEach(b => 
+                        b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const dataset = btn.getAttribute('data-dataset');
+                    renderChart(dataset);
+                });
+            });
+            
+            // Render default chart
+            renderChart('population');
+        }
+        
+        function renderChart(datasetName) {
+            const container = document.getElementById('chart-container');
+            const data = datasets[datasetName];
+            const info = dataInfo[datasetName];
+            
+            // Clear container
+            container.innerHTML = `<h3>${info.title}</h3><p>${info.description}</p>`;
+            
+            // Create chart elements
+            const chartArea = document.createElement('div');
+            chartArea.style.height = '250px';
+            chartArea.style.position = 'relative';
+            chartArea.style.marginTop = '20px';
+            chartArea.style.display = 'flex';
+            chartArea.style.alignItems = 'flex-end';
+            chartArea.style.justifyContent = 'space-around';
+            
+            // Find max value for scaling
+            const maxValue = Math.max(...data.map(d => d.value));
+            
+            // Create bars
+            data.forEach(item => {
+                const bar = document.createElement('div');
+                bar.style.width = '30px';
+                bar.style.backgroundColor = '#4C86F9';
+                bar.style.borderRadius = '4px 4px 0 0';
+                bar.style.position = 'relative';
+                
+                // Animate height from 0 to final height
+                bar.style.height = '0';
+                bar.style.transition = 'height 1s ease-out';
+                
+                const label = document.createElement('div');
+                label.textContent = item.year;
+                label.style.position = 'absolute';
+                label.style.bottom = '-25px';
+                label.style.left = '0';
+                label.style.right = '0';
+                label.style.textAlign = 'center';
+                
+                const value = document.createElement('div');
+                value.textContent = item.value;
+                value.style.position = 'absolute';
+                value.style.top = '-25px';
+                value.style.left = '0';
+                value.style.right = '0';
+                value.style.textAlign = 'center';
+                
+                bar.appendChild(label);
+                bar.appendChild(value);
+                chartArea.appendChild(bar);
+                
+                // Trigger animation after a short delay
+                setTimeout(() => {
+                    bar.style.height = `${(item.value / maxValue) * 200}px`;
+                }, 100);
+            });
+            
+            container.appendChild(chartArea);
+        }
+    </script>
+</body>
+</html>
